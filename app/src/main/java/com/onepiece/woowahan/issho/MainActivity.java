@@ -1,10 +1,13 @@
 package com.onepiece.woowahan.issho;
 
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
+import android.widget.TextView;
+
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -12,42 +15,29 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        initToobar();
-        initTabLayout();
+        ButterKnife.bind(this);
     }
 
-    private void initToobar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    @OnClick({R.id.ad, R.id.bus})
+    public void btnPressed(TextView tv) {
+        switch (tv.getId()) {
+            case R.id.ad:
+                fragReplace(FragmentFactory.FragmentTag.AD);
+                break;
+            case R.id.bus:
+                fragReplace(FragmentFactory.FragmentTag.BUS_STOP);
+                break;
+            default:
+                break;
+        }
     }
 
-    private void initTabLayout() {
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText("광고로 찾기"));
-        tabLayout.addTab(tabLayout.newTab().setText("정류장으로 찾기"));
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        final PagerAdapter adapter = new PagerAdapter
-                (getSupportFragmentManager(), tabLayout.getTabCount());
-        viewPager.setAdapter(adapter);
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                viewPager.setCurrentItem(tab.getPosition());
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
+    private void fragReplace(FragmentFactory.FragmentTag tag) {
+        Fragment newFragment = FragmentFactory.getInstacne().getFragment(tag);
+        FragmentTransaction transaction = getSupportFragmentManager()
+                .beginTransaction();
+        transaction.replace(R.id.ll_fragment, newFragment);
+        transaction.commit();
     }
 }
