@@ -1,4 +1,4 @@
-package com.onepiece.woowahan.issho;
+package com.onepiece.woowahan.issho.view;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,27 +8,32 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 
+import com.onepiece.woowahan.issho.BusStopContract;
+import com.onepiece.woowahan.issho.presenter.BusStopPresenter;
+import com.onepiece.woowahan.issho.R;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
  * Created by useruser on 2016. 1. 19..
  */
-public class BusStopFragment extends Fragment {
+
+public class BusStopFragment extends Fragment implements BusStopContract.View {
 
     @Bind(R.id.auto_complete_tv)
     AutoCompleteTextView autoCompleteTv;
 
-    private String title;
+    private BusStopPresenter presenter;
+    public BusStopFragment() {
 
-    public BusStopFragment(String title) {
-        this.title = title;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_bus_stop, container, false);
         ButterKnife.bind(this, v);
+        presenter = new BusStopPresenter(this);
         init();
         return v;
     }
@@ -39,22 +44,12 @@ public class BusStopFragment extends Fragment {
         ButterKnife.unbind(this);
     }
 
-    private void init() {
+    @Override
+    public void init() {
+        final String title = getArguments().getString("title");
         getActivity().setTitle(title);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this.getActivity(), android.R.layout.simple_list_item_1, getArr());
+        String[] autoCompleteArr = presenter.getBusStopAutoCompleteArr();
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this.getActivity(), android.R.layout.simple_list_item_1, autoCompleteArr);
         autoCompleteTv.setAdapter(adapter);
-    }
-
-    private String[] getArr() {
-        String[] arr = new String[8];
-        arr[0] = "용대";
-        arr[1] = "용대1";
-        arr[2] = "태준";
-        arr[3] = "태준1";
-        arr[4] = "태양";
-        arr[5] = "태양1";
-        arr[6] = "여은";
-        arr[7] = "여은1";
-        return arr;
     }
 }

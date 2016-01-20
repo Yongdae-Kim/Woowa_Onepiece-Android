@@ -1,9 +1,8 @@
-package com.onepiece.woowahan.issho;
+package com.onepiece.woowahan.issho.view;
 
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -11,19 +10,23 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.common.collect.Maps;
+import com.onepiece.woowahan.issho.AdContract;
+import com.onepiece.woowahan.issho.R;
+import com.onepiece.woowahan.issho.presenter.AdPresenter;
 
-import java.util.HashMap;
+import java.io.Serializable;
 import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-import static android.support.design.widget.TabLayout.*;
+import static android.support.design.widget.TabLayout.GRAVITY_FILL;
+import static android.support.design.widget.TabLayout.TabLayoutOnPageChangeListener;
 
 /**
  * Created by useruser on 2016. 1. 19..
  */
-public class AdFragment extends Fragment {
+public class AdFragment extends Fragment implements AdContract.View {
 
     @Bind(R.id.tab_layout)
     TabLayout tabLayout;
@@ -31,17 +34,20 @@ public class AdFragment extends Fragment {
     @Bind(R.id.pager)
     ViewPager viewPager;
 
-    private String title;
+    private AdPresenter presenter;
 
-    public AdFragment(String title) {
-        this.title = title;
+    public AdFragment() {
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_ad, container, false);
         ButterKnife.bind(this, v);
+        presenter = new AdPresenter(this);
         init();
+
+
         return v;
     }
 
@@ -51,8 +57,9 @@ public class AdFragment extends Fragment {
         ButterKnife.unbind(this);
     }
 
-    private void init() {
-        System.out.println("init");
+    @Override
+    public void init() {
+        final String title = getArguments().getString("title");
         getActivity().setTitle(title);
         initTabLayout();
         initViewPager();
@@ -64,26 +71,12 @@ public class AdFragment extends Fragment {
         tabLayout.addTab(tabLayout.newTab().setText(AdType.STORE.getName()));
         tabLayout.addTab(tabLayout.newTab().setText(AdType.ETC.getName()));
         tabLayout.setTabGravity(GRAVITY_FILL);
-        tabLayout.setOnTabSelectedListener(listener);
+        tabLayout.setOnTabSelectedListener(presenter.adTabSelectedListener(viewPager));
     }
 
-    private OnTabSelectedListener listener = new OnTabSelectedListener() {
-        @Override
-        public void onTabSelected(Tab tab) {
-            viewPager.setCurrentItem(tab.getPosition());
-        }
-
-        @Override
-        public void onTabUnselected(Tab tab) {
-        }
-
-        @Override
-        public void onTabReselected(Tab tab) {
-        }
-    };
-
     private void initViewPager() {
-        viewPager.setAdapter(new FragmentPagerAdapter(getFragmentManager()) {
+        // FragmentStatePagerAdapter 를 사용 할 경우 에러발생
+        viewPager.setAdapter(new FragmentStatePagerAdapter(getChildFragmentManager()) {
             @Override
             public int getCount() {
                 return tabLayout.getTabCount();
@@ -93,22 +86,26 @@ public class AdFragment extends Fragment {
             public Fragment getItem(int position) {
                 String name = tabLayout.getTabAt(position).getText().toString();
                 AdType adType = AdType.get(name);
-                return new AdListFragment(adType);
+                Fragment adListFrag = new AdListFragment();
+                Bundle args = new Bundle();
+                args.putSerializable("adType", adType);
+                adListFrag.setArguments(args);
+                return adListFrag;
             }
         });
         viewPager.addOnPageChangeListener(new TabLayoutOnPageChangeListener(tabLayout));
     }
 
-    public enum AdType {
+    public enum AdType implements Serializable {
         FOOD("음식", 1), CULTURE("문화", 2), STORE("매장", 3), ETC("기타", 4);
 
-        private final String typeName;
-        private final int typeCode;
+        private final String name;
+        private final int code;
         private static final Map<String, AdType> lookup = Maps.newHashMap();
 
-        AdType(String typeName, int typeCode) {
-            this.typeName = typeName;
-            this.typeCode = typeCode;
+        AdType(String name, int code) {
+            this.name = name;
+            this.code = code;
         }
 
         static {
@@ -122,12 +119,12 @@ public class AdFragment extends Fragment {
         }
 
         public String getName() {
-            return typeName;
+            return name;
         }
 
         public int getCode() {
-            return typeCode;
+            return code;
         }
     }
-}
 
+}
