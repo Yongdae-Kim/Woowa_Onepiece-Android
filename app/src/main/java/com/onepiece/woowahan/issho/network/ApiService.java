@@ -24,7 +24,10 @@ public interface ApiService {
     Call<List<AdModel>> getAdModelList();
 
     @GET("ads.json")
-    Call<List<AdModel>> getAdModelListByCode(@Query("code") int code);
+    Call<List<AdModel>> getAdModelList(@Query("offset") int offset, @Query("limit") int limit);
+
+    @GET("ads.json")
+    Call<List<AdModel>> getAdModelListByCode(@Query("code") int code, @Query("offset") int offset, @Query("limit") int limit);
 
     @GET("ads/{id}.json")
     Call<AdModel> getAdModel(@Path("id") int id);

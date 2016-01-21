@@ -22,8 +22,9 @@
             </intent-filter>
         </activity>
 
-    </application>
+        <activity android:name=".view.AdDetailActivity"></activity>
 
+    </application>
 
 
 </manifest>

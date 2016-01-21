@@ -2,9 +2,12 @@ package com.onepiece.woowahan.issho.view;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.TextView;
 
 import com.onepiece.woowahan.issho.R;
@@ -23,8 +26,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        setSupportActionBar(toolbar);
+
+        initToolbar();
+
+        fragReplace(FragmentFactory.FragmentTag.AD);
     }
+
+    private void initToolbar() {
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+    }
+
 
     @OnClick({R.id.ad, R.id.bus})
     public void btnPressed(TextView tv) {
@@ -43,8 +55,10 @@ public class MainActivity extends AppCompatActivity {
     private void fragReplace(FragmentFactory.FragmentTag tag) {
         Fragment newFragment = FragmentFactory.getInstacne().getFragment(tag);
         Bundle args = new Bundle();
-        args.putString("title", tag.getTitle());
-        newFragment.setArguments(args);
+        if (args.getString("title") != null) {
+            args.putString("title", tag.getTitle());
+            newFragment.setArguments(args);
+        }
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction();
         transaction.replace(R.id.ll_fragment, newFragment);

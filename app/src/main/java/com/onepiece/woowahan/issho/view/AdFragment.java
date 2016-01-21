@@ -3,18 +3,23 @@ package com.onepiece.woowahan.issho.view;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import com.onepiece.woowahan.issho.AdContract;
 import com.onepiece.woowahan.issho.R;
 import com.onepiece.woowahan.issho.presenter.AdPresenter;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.Bind;
@@ -47,7 +52,6 @@ public class AdFragment extends Fragment implements AdContract.View {
         presenter = new AdPresenter(this);
         init();
 
-
         return v;
     }
 
@@ -59,24 +63,26 @@ public class AdFragment extends Fragment implements AdContract.View {
 
     @Override
     public void init() {
-        final String title = getArguments().getString("title");
-        getActivity().setTitle(title);
+        Bundle args = getArguments();
+        if (args != null) {
+            final String title = args.getString("title");
+            getActivity().setTitle(title);
+        }
         initTabLayout();
         initViewPager();
     }
 
     private void initTabLayout() {
-        tabLayout.addTab(tabLayout.newTab().setText(AdType.FOOD.getName()));
-        tabLayout.addTab(tabLayout.newTab().setText(AdType.CULTURE.getName()));
-        tabLayout.addTab(tabLayout.newTab().setText(AdType.STORE.getName()));
-        tabLayout.addTab(tabLayout.newTab().setText(AdType.ETC.getName()));
+        List<AdType> adTypeList = AdType.getAdTypeList();
+        for (AdType adType : adTypeList) {
+            tabLayout.addTab(tabLayout.newTab().setText(adType.getName()));
+        }
         tabLayout.setTabGravity(GRAVITY_FILL);
-        tabLayout.setOnTabSelectedListener(presenter.adTabSelectedListener(viewPager));
+        tabLayout.setOnTabSelectedListener(presenter.adTabClickedEvent(viewPager));
     }
 
     private void initViewPager() {
-        // FragmentStatePagerAdapter 를 사용 할 경우 에러발생
-        viewPager.setAdapter(new FragmentStatePagerAdapter(getChildFragmentManager()) {
+        viewPager.setAdapter(new FragmentPagerAdapter(getChildFragmentManager()) {
             @Override
             public int getCount() {
                 return tabLayout.getTabCount();
@@ -101,7 +107,8 @@ public class AdFragment extends Fragment implements AdContract.View {
 
         private final String name;
         private final int code;
-        private static final Map<String, AdType> lookup = Maps.newHashMap();
+        private static Map<String, AdType> adTypeMap;
+        private static List<AdType> adTypeList;
 
         AdType(String name, int code) {
             this.name = name;
@@ -109,13 +116,21 @@ public class AdFragment extends Fragment implements AdContract.View {
         }
 
         static {
+            adTypeMap = Maps.newHashMap();
             for (AdType v : AdType.values()) {
-                lookup.put(v.getName(), v);
+                adTypeMap.put(v.getName(), v);
             }
+            adTypeList = Lists.newArrayList(adTypeMap.values());
+            Collections.sort(adTypeList, Ordering.natural().nullsFirst());
         }
 
+
         public static AdType get(String name) {
-            return lookup.get(name);
+            return adTypeMap.get(name);
+        }
+
+        public static List<AdType> getAdTypeList() {
+            return adTypeList;
         }
 
         public String getName() {

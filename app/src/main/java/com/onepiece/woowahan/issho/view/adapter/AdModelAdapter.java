@@ -1,6 +1,7 @@
-package com.onepiece.woowahan.issho.view;
+package com.onepiece.woowahan.issho.view.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import com.onepiece.woowahan.issho.R;
 import com.onepiece.woowahan.issho.model.AdModel;
 import com.onepiece.woowahan.issho.model.Image;
+import com.onepiece.woowahan.issho.view.AdDetailActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -45,10 +47,9 @@ public class AdModelAdapter extends RecyclerView.Adapter<AdModelAdapter.ViewHold
         final AdModel adModel = adModelList.get(position);
         loadAdThumbnail(holder, adModel);
         holder.adTv.setText(adModel.getTitle());
-        holder.adCv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
+        holder.adCv.setOnClickListener(v -> {
+            Intent intent = new Intent(context, AdDetailActivity.class);
+            context.startActivity(intent);
         });
     }
 
@@ -63,13 +64,8 @@ public class AdModelAdapter extends RecyclerView.Adapter<AdModelAdapter.ViewHold
     }
 
     private String getAdThumbnailImgUri(AdModel adModel) {
-        String imgUri;
         List<Image> images = adModel.getImages();
-        if (images.size() != 0) {
-            imgUri = images.get(0).getUri();
-        } else {
-            imgUri = NO_IMG_URL;
-        }
+        String imgUri = images.size() != 0 ? images.get(0).getUri() : NO_IMG_URL;
         return imgUri;
     }
 

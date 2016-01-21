@@ -16,7 +16,7 @@ public class AdPresenter implements AdContract.UserAction {
     }
 
     @Override
-    public TabLayout.OnTabSelectedListener adTabSelectedListener(final ViewPager viewPager) {
+    public TabLayout.OnTabSelectedListener adTabClickedEvent (final ViewPager viewPager) {
         return new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {

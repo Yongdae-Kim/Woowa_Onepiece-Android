@@ -8,9 +8,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 
+import com.google.common.collect.Lists;
 import com.onepiece.woowahan.issho.BusStopContract;
+import com.onepiece.woowahan.issho.model.BusStopModel;
 import com.onepiece.woowahan.issho.presenter.BusStopPresenter;
 import com.onepiece.woowahan.issho.R;
+
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -25,6 +29,7 @@ public class BusStopFragment extends Fragment implements BusStopContract.View {
     AutoCompleteTextView autoCompleteTv;
 
     private BusStopPresenter presenter;
+
     public BusStopFragment() {
 
     }
@@ -33,8 +38,9 @@ public class BusStopFragment extends Fragment implements BusStopContract.View {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_bus_stop, container, false);
         ButterKnife.bind(this, v);
-        presenter = new BusStopPresenter(this);
         init();
+        presenter = new BusStopPresenter(this);
+        presenter.requestBusStopModelList();
         return v;
     }
 
@@ -46,10 +52,16 @@ public class BusStopFragment extends Fragment implements BusStopContract.View {
 
     @Override
     public void init() {
-        final String title = getArguments().getString("title");
-        getActivity().setTitle(title);
-        String[] autoCompleteArr = presenter.getBusStopAutoCompleteArr();
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this.getActivity(), android.R.layout.simple_list_item_1, autoCompleteArr);
+        Bundle args = getArguments();
+        if (args != null) {
+            final String title = args.getString("title");
+            getActivity().setTitle(title);
+        }
+    }
+
+    @Override
+    public void setBusStopAutocomplete(List<String> busStopNamelist) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this.getActivity(), android.R.layout.simple_list_item_1, busStopNamelist);
         autoCompleteTv.setAdapter(adapter);
     }
 }

@@ -12,6 +12,6 @@ public interface AdContract {
     }
 
     public interface UserAction {
-        TabLayout.OnTabSelectedListener adTabSelectedListener(ViewPager viewPager);
+        TabLayout.OnTabSelectedListener adTabClickedEvent(ViewPager viewPager);
     }
 }
