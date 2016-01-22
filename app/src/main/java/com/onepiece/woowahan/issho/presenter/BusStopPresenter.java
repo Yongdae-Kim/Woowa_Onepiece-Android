@@ -1,6 +1,5 @@
 package com.onepiece.woowahan.issho.presenter;
 
-import android.view.View;
 import android.widget.AdapterView;
 
 import com.google.android.gms.common.ConnectionResult;

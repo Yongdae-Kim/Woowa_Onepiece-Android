@@ -32,6 +32,8 @@ import static android.support.design.widget.TabLayout.TabLayoutOnPageChangeListe
  */
 public class AdFragment extends Fragment implements AdContract.View {
 
+    public static final String ARGUMENT_AD_TYPE = "adType";
+
     private AdPresenter presenter;
 
     @Bind(R.id.tab_layout)
@@ -64,7 +66,7 @@ public class AdFragment extends Fragment implements AdContract.View {
     private void initView() {
         Bundle args = getArguments();
         if (args != null) {
-            final String title = args.getString("title");
+            final String title = args.getString(MainActivity.ARGUMENT_TITLE);
             getActivity().setTitle(title);
         }
         initTabLayout();
@@ -93,7 +95,7 @@ public class AdFragment extends Fragment implements AdContract.View {
                 AdType adType = AdType.get(name);
                 Fragment adListFrag = new AdListFragment();
                 Bundle args = new Bundle();
-                args.putSerializable("adType", adType);
+                args.putSerializable(ARGUMENT_AD_TYPE, adType);
                 adListFrag.setArguments(args);
                 return adListFrag;
             }

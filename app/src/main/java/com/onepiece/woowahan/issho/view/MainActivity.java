@@ -18,6 +18,8 @@ import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String ARGUMENT_TITLE = "title";
+
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
@@ -57,8 +59,8 @@ public class MainActivity extends AppCompatActivity {
     private void fragReplace(FragmentFactory.FragmentTag tag) {
         Fragment newFragment = FragmentFactory.getInstacne().getFragment(tag);
         Bundle args = new Bundle();
-        if (args.getString("title") != null) {
-            args.putString("title", tag.getTitle());
+        if (args.getString(ARGUMENT_TITLE) != null) {
+            args.putString(ARGUMENT_TITLE, tag.getTitle());
             newFragment.setArguments(args);
         }
         FragmentTransaction transaction = getSupportFragmentManager()

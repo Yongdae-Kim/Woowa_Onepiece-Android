@@ -55,7 +55,7 @@ public class AdListFragment extends Fragment implements AdListContract.View {
 
         Bundle args = getArguments();
         if (args != null) {
-            adType = (AdFragment.AdType) getArguments().getSerializable("adType");
+            adType = (AdFragment.AdType) getArguments().getSerializable(AdFragment.ARGUMENT_AD_TYPE);
             presenter.requestAdModelList(adType.getCode());
         }
 

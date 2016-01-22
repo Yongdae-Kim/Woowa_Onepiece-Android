@@ -1,14 +1,17 @@
 package com.onepiece.woowahan.issho.view;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.ListAdapter;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -39,6 +42,11 @@ public class BusStopFragment extends Fragment implements BusStopContract.View {
 
 
     private static final int GOOGLE_MAP_NOT_SUPPORTED_REQUEST_CODE = 10;
+    private static final int GOOGLE_MAP_ZOOM = 14;
+    private static final int GOOGLE_MAP_BEARING = 90;
+    private static final int GOOGLE_MAP_ANIMATION_DURATION = 3000;
+    private static final float GOOGLE_MAP_ANCHOR_X = 0.0f;
+    private static final float GOOGLE_MAP_ANCHOR_Y = 1.0f;
 
     private View v;
     private GoogleMap map;
@@ -73,7 +81,7 @@ public class BusStopFragment extends Fragment implements BusStopContract.View {
     private void initView() {
         Bundle args = getArguments();
         if (args != null) {
-            final String title = args.getString("title");
+            final String title = args.getString(MainActivity.ARGUMENT_TITLE);
             getActivity().setTitle(title);
         }
         initGoogleMap();
@@ -117,7 +125,17 @@ public class BusStopFragment extends Fragment implements BusStopContract.View {
 
     @Override
     public void showDialogWhenMarkerClicked(Marker marker) {
-        marker.showInfoWindow();
+//        StringBuilder builder = new StringBuilder();
+//        builder.append(busStop.getName()).append("(진행중인 광고 : ").append(busStop.getAdsCnt()).append(")");
+//
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity(), R.style.AlertDialogStyle);
+        builder.setTitle(marker.getTitle());
+        builder.setMessage(marker.getSnippet());
+        builder.setPositiveButton("광고보기", (dialog, which) -> {
+
+        });
+        builder.setNegativeButton("취소", null);
+        builder.show();
     }
 
     @Override
@@ -130,7 +148,8 @@ public class BusStopFragment extends Fragment implements BusStopContract.View {
                 Marker marker = map.addMarker(markerOptions);
                 markerMap.put(busStop.getName(), marker);
             }
-            focusToMarker(markerMap.get("한라병원"));
+            String defaultMarkerKey = markerMap.keySet().iterator().next();
+            focusToMarker(markerMap.get(defaultMarkerKey));
         }
     }
 
@@ -147,7 +166,7 @@ public class BusStopFragment extends Fragment implements BusStopContract.View {
                 .title(title)
                 .snippet(snippet)
                 .position(position)
-                .anchor(0.0f, 1.0f);
+                .anchor(GOOGLE_MAP_ANCHOR_X, GOOGLE_MAP_ANCHOR_Y);
 
         return markerOptions;
     }
@@ -155,11 +174,11 @@ public class BusStopFragment extends Fragment implements BusStopContract.View {
     private void focusToMarker(Marker marker) {
         CameraPosition cameraPosition = CameraPosition.builder()
                 .target(marker.getPosition())
-                .zoom(14)
-                .bearing(90)
+                .zoom(GOOGLE_MAP_ZOOM)
+                .bearing(GOOGLE_MAP_BEARING)
                 .build();
         map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),
-                3000, null);
+                GOOGLE_MAP_ANIMATION_DURATION, null);
     }
 
     @Override

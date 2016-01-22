@@ -39,7 +39,7 @@ public class AdDetailActivity extends AppCompatActivity implements AdDetailContr
 
         Intent args = getIntent();
         if (args != null) {
-            AdModel adModel = (AdModel) args.getSerializableExtra("adModel");
+            AdModel adModel = (AdModel) args.getSerializableExtra(AdFragment.ARGUMENT_AD_TYPE);
 //            getActivity().setTitle(title);
         }
     }
