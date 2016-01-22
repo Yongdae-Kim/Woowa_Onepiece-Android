@@ -25,10 +25,10 @@ import butterknife.ButterKnife;
 
 public class AdListFragment extends Fragment implements AdListContract.View {
 
-    private View v;
-    private AdFragment.AdType adType;
     private AdListPresenter presenter;
 
+    private View v;
+    private AdFragment.AdType adType;
 
     @Bind(R.id.ad_recycler_view)
     RecyclerView recyclerView;
@@ -43,26 +43,29 @@ public class AdListFragment extends Fragment implements AdListContract.View {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_ad_list, container, false);
         ButterKnife.bind(this, v);
-        init();
 
         presenter = new AdListPresenter(this);
+        initView();
+
+        return v;
+    }
+
+    private void initView() {
+        initRecyclerView();
 
         Bundle args = getArguments();
         if (args != null) {
             adType = (AdFragment.AdType) getArguments().getSerializable("adType");
-            System.out.println(adType.getCode());
             presenter.requestAdModelList(adType.getCode());
         }
-        return v;
+
     }
 
-
-    @Override
-    public void init() {
+    private void initRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getActivity());
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.addOnScrollListener(mOnScrollListener);
+        recyclerView.addOnScrollListener(presenter.scrollListener());
     }
 
     @Override
@@ -70,14 +73,5 @@ public class AdListFragment extends Fragment implements AdListContract.View {
         adModelAdapter = new AdModelAdapter(this.getActivity(), adModelList);
         recyclerView.setAdapter(adModelAdapter);
     }
-
-    private RecyclerView.OnScrollListener mOnScrollListener = new RecyclerView.OnScrollListener() {
-        @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-
-
-        }
-    };
-
 }
 

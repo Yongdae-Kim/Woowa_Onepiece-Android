@@ -1,5 +1,6 @@
 package com.onepiece.woowahan.issho.view.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.CardView;
@@ -26,13 +27,14 @@ import butterknife.ButterKnife;
  */
 public class AdModelAdapter extends RecyclerView.Adapter<AdModelAdapter.ViewHolder> {
 
+    private static final String EXTRA_AD_MODEL = "adModel";
     private static final String NO_IMG_URL = "http://www.woowahan.com/wp-content/uploads/2012/01/main_logo.gif";
 
-    private Context context;
+    private Activity activity;
     private List<AdModel> adModelList;
 
-    public AdModelAdapter(Context context, List<AdModel> adModelList) {
-        this.context = context;
+    public AdModelAdapter(Activity activity, List<AdModel> adModelList) {
+        this.activity = activity;
         this.adModelList = adModelList;
     }
 
@@ -48,8 +50,11 @@ public class AdModelAdapter extends RecyclerView.Adapter<AdModelAdapter.ViewHold
         loadAdThumbnail(holder, adModel);
         holder.adTv.setText(adModel.getTitle());
         holder.adCv.setOnClickListener(v -> {
-            Intent intent = new Intent(context, AdDetailActivity.class);
-            context.startActivity(intent);
+            Intent intent = new Intent(activity, AdDetailActivity.class);
+            if (intent.getSerializableExtra("EXTRA_AD_MODEL") != null) {
+                intent.putExtra(EXTRA_AD_MODEL, adModel);
+            }
+            activity.startActivity(intent);
         });
     }
 
@@ -57,7 +62,7 @@ public class AdModelAdapter extends RecyclerView.Adapter<AdModelAdapter.ViewHold
         String imgUri = getAdThumbnailImgUri(adModel);
         holder.adIv.setTag(imgUri);
         if (imgUri.equals(holder.adIv.getTag())) {
-            Picasso.with(context)
+            Picasso.with(activity)
                     .load(imgUri)
                     .into(holder.adIv);
         }

@@ -1,7 +1,6 @@
 package com.onepiece.woowahan.issho.presenter;
 
 import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
 
 import com.onepiece.woowahan.issho.AdContract;
 
@@ -16,11 +15,11 @@ public class AdPresenter implements AdContract.UserAction {
     }
 
     @Override
-    public TabLayout.OnTabSelectedListener adTabClickedEvent (final ViewPager viewPager) {
+    public TabLayout.OnTabSelectedListener adTypeTabSelectedListener() {
         return new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                viewPager.setCurrentItem(tab.getPosition());
+                viewListener.displayCurrentTabScreen(tab);
             }
 
             @Override

@@ -1,6 +1,14 @@
 package com.onepiece.woowahan.issho.network;
 
+import com.onepiece.woowahan.issho.model.AdModel;
+import com.onepiece.woowahan.issho.model.BusStopModel;
+
+import java.util.List;
+
+import retrofit.Call;
+import retrofit.Callback;
 import retrofit.GsonConverterFactory;
+import retrofit.Response;
 import retrofit.Retrofit;
 
 /**
@@ -11,7 +19,7 @@ public class ApiRequester {
     private static ApiRequester requester;
 
     private final String API_URI = "http://10.10.0.91:5050/api/";
-    private final Retrofit retrofit;
+    private Retrofit retrofit;
 
     private ApiRequester() {
         retrofit = new Retrofit.Builder()
@@ -25,9 +33,8 @@ public class ApiRequester {
         return requester;
     }
 
-    public void call(ApiCallback apiCallback) {
-        ApiService service = retrofit.create(ApiService.class);
-        apiCallback.callbackMethod(service);
+    public ApiService getService() {
+        return retrofit.create(ApiService.class);
     }
 }
 

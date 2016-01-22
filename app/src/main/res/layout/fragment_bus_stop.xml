@@ -13,4 +13,11 @@
         android:elevation="6dp"
         android:minHeight="?attr/actionBarSize" />
 
+    <fragment
+        android:id="@+id/map"
+        class="com.google.android.gms.maps.MapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/auto_complete_tv" />
+
 </RelativeLayout>

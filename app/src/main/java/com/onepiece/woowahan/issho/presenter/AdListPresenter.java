@@ -1,8 +1,11 @@
 package com.onepiece.woowahan.issho.presenter;
 
+import android.support.v7.widget.RecyclerView;
+
 import com.onepiece.woowahan.issho.AdListContract;
 import com.onepiece.woowahan.issho.model.AdModel;
 import com.onepiece.woowahan.issho.network.ApiRequester;
+import com.onepiece.woowahan.issho.network.ApiService;
 
 import java.util.List;
 
@@ -27,7 +30,8 @@ public class AdListPresenter implements AdListContract.UserAction {
 
     public void requestAdModelList(final int code) {
         isRequesting = true;
-        ApiRequester.getInstacne().call(service -> service.getAdModelListByCode(code, offset, limit).enqueue(new Callback<List<AdModel>>() {
+        ApiService service = ApiRequester.getInstacne().getService();
+        service.getAdModelListByCode(code, offset, limit).enqueue(new Callback<List<AdModel>>() {
             @Override
             public void onResponse(Response<List<AdModel>> response, Retrofit retrofit) {
                 if (!response.isSuccess()) {
@@ -42,6 +46,15 @@ public class AdListPresenter implements AdListContract.UserAction {
             public void onFailure(Throwable t) {
 
             }
-        }));
+        });
+    }
+
+    @Override
+    public RecyclerView.OnScrollListener scrollListener() {
+        return new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            }
+        };
     }
 }

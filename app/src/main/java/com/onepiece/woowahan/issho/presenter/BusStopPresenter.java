@@ -1,9 +1,12 @@
 package com.onepiece.woowahan.issho.presenter;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.common.collect.Lists;
 import com.onepiece.woowahan.issho.BusStopContract;
 import com.onepiece.woowahan.issho.model.BusStopModel;
 import com.onepiece.woowahan.issho.network.ApiRequester;
+import com.onepiece.woowahan.issho.network.ApiService;
 
 import java.util.List;
 
@@ -27,7 +30,8 @@ public class BusStopPresenter implements BusStopContract.UserAction {
     @Override
     public void requestBusStopModelList() {
         isRequesting = true;
-        ApiRequester.getInstacne().call(service -> service.getBusStopModelList().enqueue(new Callback<List<BusStopModel>>() {
+        ApiService service = ApiRequester.getInstacne().getService();
+        service.getBusStopModelList().enqueue(new Callback<List<BusStopModel>>() {
             @Override
             public void onResponse(Response<List<BusStopModel>> response, Retrofit retrofit) {
                 if (!response.isSuccess()) {
@@ -35,12 +39,30 @@ public class BusStopPresenter implements BusStopContract.UserAction {
                 List<BusStopModel> list = response.body();
                 List<String> busStopNameList = Lists.transform(list, busStopModel -> busStopModel.getName());
                 viewListener.setBusStopAutocomplete(busStopNameList);
+                viewListener.displayBusStopMarkerOnMap(list);
                 isRequesting = false;
             }
 
             @Override
             public void onFailure(Throwable t) {
             }
-        }));
+        });
+    }
+
+    @Override
+    public void checkGoogleMapSupported(int status) {
+        if (status != ConnectionResult.SUCCESS) {
+            viewListener.showDialogWhenGoogleMapNotSupported(status);
+        } else {
+            viewListener.setGoogleMap();
+        }
+    }
+
+    @Override
+    public GoogleMap.OnMarkerClickListener markerClickListener() {
+        return marker -> {
+            viewListener.showDialogWhenMarkerClicked(marker);
+            return false;
+        };
     }
 }

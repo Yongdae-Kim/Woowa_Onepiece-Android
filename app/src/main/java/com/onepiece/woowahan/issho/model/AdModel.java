@@ -2,13 +2,14 @@ package com.onepiece.woowahan.issho.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 /**
  * Created by useruser on 2016. 1. 20..
  */
-public class AdModel {
+public class AdModel implements Serializable {
     @SerializedName("id")
     private int id;
     @SerializedName("cd_id")

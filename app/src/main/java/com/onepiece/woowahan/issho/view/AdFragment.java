@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,13 +32,13 @@ import static android.support.design.widget.TabLayout.TabLayoutOnPageChangeListe
  */
 public class AdFragment extends Fragment implements AdContract.View {
 
+    private AdPresenter presenter;
+
     @Bind(R.id.tab_layout)
     TabLayout tabLayout;
 
     @Bind(R.id.pager)
     ViewPager viewPager;
-
-    private AdPresenter presenter;
 
     public AdFragment() {
 
@@ -49,8 +48,9 @@ public class AdFragment extends Fragment implements AdContract.View {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_ad, container, false);
         ButterKnife.bind(this, v);
+
         presenter = new AdPresenter(this);
-        init();
+        initView();
 
         return v;
     }
@@ -61,8 +61,7 @@ public class AdFragment extends Fragment implements AdContract.View {
         ButterKnife.unbind(this);
     }
 
-    @Override
-    public void init() {
+    private void initView() {
         Bundle args = getArguments();
         if (args != null) {
             final String title = args.getString("title");
@@ -78,7 +77,7 @@ public class AdFragment extends Fragment implements AdContract.View {
             tabLayout.addTab(tabLayout.newTab().setText(adType.getName()));
         }
         tabLayout.setTabGravity(GRAVITY_FILL);
-        tabLayout.setOnTabSelectedListener(presenter.adTabClickedEvent(viewPager));
+        tabLayout.setOnTabSelectedListener(presenter.adTypeTabSelectedListener());
     }
 
     private void initViewPager() {
@@ -100,6 +99,11 @@ public class AdFragment extends Fragment implements AdContract.View {
             }
         });
         viewPager.addOnPageChangeListener(new TabLayoutOnPageChangeListener(tabLayout));
+    }
+
+    @Override
+    public void displayCurrentTabScreen(TabLayout.Tab tab) {
+        viewPager.setCurrentItem(tab.getPosition());
     }
 
     public enum AdType implements Serializable {

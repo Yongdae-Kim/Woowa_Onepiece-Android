@@ -1,17 +1,16 @@
 package com.onepiece.woowahan.issho;
 
 import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
 
 /**
  * Created by useruser on 2016. 1. 20..
  */
 public interface AdContract {
-    public interface View {
-        void init();
+    interface View {
+        void displayCurrentTabScreen(TabLayout.Tab tab);
     }
 
-    public interface UserAction {
-        TabLayout.OnTabSelectedListener adTabClickedEvent(ViewPager viewPager);
+    interface UserAction {
+        TabLayout.OnTabSelectedListener adTypeTabSelectedListener();
     }
 }

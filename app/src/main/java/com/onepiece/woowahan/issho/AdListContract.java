@@ -1,5 +1,7 @@
 package com.onepiece.woowahan.issho;
 
+import android.support.v7.widget.RecyclerView;
+
 import com.onepiece.woowahan.issho.model.AdModel;
 
 import java.util.List;
@@ -9,12 +11,14 @@ import java.util.List;
  */
 public interface AdListContract {
 
-    public interface View {
-        void init();
+    interface View {
+
         void displayAdListView(List<AdModel> adModelList);
     }
 
-    public interface UserAction {
+    interface UserAction {
         void requestAdModelList(int code);
+
+        RecyclerView.OnScrollListener scrollListener();
     }
 }
