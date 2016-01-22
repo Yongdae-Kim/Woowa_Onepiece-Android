@@ -14,6 +14,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -36,15 +37,17 @@ import butterknife.ButterKnife;
 
 public class BusStopFragment extends Fragment implements BusStopContract.View {
 
+
+    private static final int GOOGLE_MAP_NOT_SUPPORTED_REQUEST_CODE = 10;
+
+    private View v;
+    private GoogleMap map;
+
     @Bind(R.id.auto_complete_tv)
     AutoCompleteTextView autoCompleteTv;
 
     private BusStopPresenter presenter;
-
     private Map<String, Marker> markerMap = Maps.newHashMap();
-
-    private View v;
-    private GoogleMap googleMap;
 
     public BusStopFragment() {
 
@@ -64,7 +67,6 @@ public class BusStopFragment extends Fragment implements BusStopContract.View {
         initView();
         presenter.requestBusStopModelList();
 
-
         return v;
     }
 
@@ -74,63 +76,65 @@ public class BusStopFragment extends Fragment implements BusStopContract.View {
             final String title = args.getString("title");
             getActivity().setTitle(title);
         }
-        usingGoogleMap();
+        initGoogleMap();
     }
 
-    private void usingGoogleMap() {
+    @Override
+    public void setBusStopAutoComplete(List<String> busStopNamelist) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this.getActivity(), android.R.layout.simple_list_item_1, busStopNamelist);
+        autoCompleteTv.setAdapter(adapter);
+        autoCompleteTv.setOnItemClickListener(presenter.autoCompleteItemCLickListener());
+    }
+
+    @Override
+    public void displayBusStopMarkerOnMap(String busStopName) {
+        Marker selectedMarker = markerMap.get(busStopName);
+        showDialogWhenMarkerClicked(selectedMarker);
+    }
+
+    private void initGoogleMap() {
         int status = GooglePlayServicesUtil
                 .isGooglePlayServicesAvailable(getActivity().getBaseContext());
-        presenter.checkGoogleMapSupported(status);
+        presenter.checkGoogleMapStatus(status);
     }
 
     @Override
     public void setGoogleMap() {
-        googleMap = ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.map))
-                .getMap();
-        googleMap.setMyLocationEnabled(true);
-        googleMap.setOnMarkerClickListener(presenter.markerClickListener());
+        MapFragment mapFrag = (MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.map);
+        mapFrag.getMapAsync(googleMap -> {
+            googleMap.setMyLocationEnabled(true);
+            googleMap.setOnMarkerClickListener(presenter.markerClickListener());
+            map = mapFrag.getMap();
+        });
     }
 
     @Override
     public void showDialogWhenGoogleMapNotSupported(int status) {
-        int requestCode = 10;
         Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status,
-                getActivity(), requestCode);
+                getActivity(), GOOGLE_MAP_NOT_SUPPORTED_REQUEST_CODE);
         dialog.show();
-    }
-
-    @Override
-    public void setBusStopAutocomplete(List<String> busStopNamelist) {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this.getActivity(), android.R.layout.simple_list_item_1, busStopNamelist);
-        autoCompleteTv.setAdapter(adapter);
     }
 
     @Override
     public void showDialogWhenMarkerClicked(Marker marker) {
         marker.showInfoWindow();
-        googleMap
-                .moveCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 15));
-//        googleMap.animateCamera(CameraUpdateFactory.zoomTo(12));
     }
 
     @Override
-    public void displayBusStopMarkerOnMap(List<BusStopModel> busStopModelList) {
-        if (googleMap != null) {
-            googleMap.clear();
+    public void displayAllBusStopMarkerOnMap(List<BusStopModel> busStopModelList) {
+        if (map != null) {
+            map.clear();
 
             for (BusStopModel busStop : busStopModelList) {
-                MarkerOptions markerOptions = generateMakerOptions(busStop);
-                Marker marker = googleMap.addMarker(markerOptions);
+                MarkerOptions markerOptions = generateBusStopMakerOptions(busStop);
+                Marker marker = map.addMarker(markerOptions);
                 markerMap.put(busStop.getName(), marker);
             }
+            focusToMarker(markerMap.get("한라병원"));
         }
-        Marker defaultMarker = markerMap.get("한라병원");
-        this.showDialogWhenMarkerClicked(defaultMarker);
     }
 
-    private MarkerOptions generateMakerOptions(BusStopModel busStop) {
-        MarkerOptions markerOptions = new MarkerOptions();
-
+    private MarkerOptions generateBusStopMakerOptions(BusStopModel busStop) {
         Location loc = busStop.getLoc();
         double lat = Double.parseDouble(loc.getLat());
         double lng = Double.parseDouble(loc.getLng());
@@ -139,11 +143,23 @@ public class BusStopFragment extends Fragment implements BusStopContract.View {
         String snippet = loc.getAddr();
         LatLng position = new LatLng(lat, lng);
 
-        markerOptions.title(title);
-        markerOptions.snippet(snippet);
-        markerOptions.position(position);
+        MarkerOptions markerOptions = new MarkerOptions()
+                .title(title)
+                .snippet(snippet)
+                .position(position)
+                .anchor(0.0f, 1.0f);
 
         return markerOptions;
+    }
+
+    private void focusToMarker(Marker marker) {
+        CameraPosition cameraPosition = CameraPosition.builder()
+                .target(marker.getPosition())
+                .zoom(14)
+                .bearing(90)
+                .build();
+        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),
+                3000, null);
     }
 
     @Override

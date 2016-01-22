@@ -1,5 +1,8 @@
 package com.onepiece.woowahan.issho.presenter;
 
+import android.view.View;
+import android.widget.AdapterView;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.common.collect.Lists;
@@ -38,8 +41,8 @@ public class BusStopPresenter implements BusStopContract.UserAction {
                 }
                 List<BusStopModel> list = response.body();
                 List<String> busStopNameList = Lists.transform(list, busStopModel -> busStopModel.getName());
-                viewListener.setBusStopAutocomplete(busStopNameList);
-                viewListener.displayBusStopMarkerOnMap(list);
+                viewListener.setBusStopAutoComplete(busStopNameList);
+                viewListener.displayAllBusStopMarkerOnMap(list);
                 isRequesting = false;
             }
 
@@ -49,8 +52,17 @@ public class BusStopPresenter implements BusStopContract.UserAction {
         });
     }
 
+
     @Override
-    public void checkGoogleMapSupported(int status) {
+    public AdapterView.OnItemClickListener autoCompleteItemCLickListener() {
+        return (parent, view, position, id) -> {
+            String busStopName = parent.getItemAtPosition(position).toString();
+            viewListener.displayBusStopMarkerOnMap(busStopName);
+        };
+    }
+
+    @Override
+    public void checkGoogleMapStatus(int status) {
         if (status != ConnectionResult.SUCCESS) {
             viewListener.showDialogWhenGoogleMapNotSupported(status);
         } else {

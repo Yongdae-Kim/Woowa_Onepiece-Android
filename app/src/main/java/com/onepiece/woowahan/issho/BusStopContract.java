@@ -1,6 +1,7 @@
 package com.onepiece.woowahan.issho;
 
 import android.app.Activity;
+import android.widget.AdapterView;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
@@ -15,7 +16,7 @@ public interface BusStopContract {
 
     interface View {
 
-        void setBusStopAutocomplete(List<String> busStopNamelist);
+        void setBusStopAutoComplete(List<String> busStopNamelist);
 
         void setGoogleMap();
 
@@ -23,14 +24,18 @@ public interface BusStopContract {
 
         void showDialogWhenMarkerClicked(Marker marker);
 
-        void displayBusStopMarkerOnMap(List<BusStopModel> busStopModelList);
+        void displayBusStopMarkerOnMap(String busStopName);
+
+        void displayAllBusStopMarkerOnMap(List<BusStopModel> busStopModelList);
     }
 
     interface UserAction {
         void requestBusStopModelList();
 
-        void checkGoogleMapSupported(int status);
+        void checkGoogleMapStatus(int status);
 
         GoogleMap.OnMarkerClickListener markerClickListener();
+
+        AdapterView.OnItemClickListener autoCompleteItemCLickListener();
     }
 }
