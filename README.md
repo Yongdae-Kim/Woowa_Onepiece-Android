@@ -1,10 +1,4 @@
-# Issho(Android Client)
-
-## 명대사
-
-### "세어야 하는 것은 우선 적의 수보다 지켜야 할 사람이 아닙니까?"
-
-![후지토라](http://livedoor.blogimg.jp/onesokuone/imgs/f/f/ffb61297-s.jpg "잇쇼")
+# Android Client
 
 ***
 
